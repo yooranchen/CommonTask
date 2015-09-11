@@ -59,10 +59,10 @@ public abstract class CommonTask<A, B> extends Observable {
 		}
 
 		@Override
-		protected void onPostExecute(B result) {
-			super.onPostExecute(result);
+		protected void onPostExecute(B b) {
+			super.onPostExecute(b);
 			setChanged();
-			notifyObservers(result);
+			notifyObservers(b);
 		}
 	}
 
@@ -81,7 +81,7 @@ public abstract class CommonTask<A, B> extends Observable {
 	 * @param t
 	 * @return
 	 */
-	public B doInBackground(A params) {
+	public B doInBackground(A a) {
 		return null;
 	}
 }
