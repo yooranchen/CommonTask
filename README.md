@@ -1,4 +1,4 @@
-bservable结合AsyncTask实现的一个带回调的异步任务
+Observable结合AsyncTask实现的一个带回调的异步任务
   ----
 ###	1.设计目的
 该类的设计旨在省去书写异步任务时，再次添加回调的方法
