@@ -1,7 +1,5 @@
 package org.yooranchen.commontask.common;
 
-import java.util.Observable;
-
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -20,11 +18,11 @@ import org.yooranchen.commontask.callback.Observer;
  * <p/>
  * B >> 回调中返回的参数类型
  */
-public abstract class CommonTask<A, B> {
+public abstract class CommonTask<T> {
 
-    private Observer mObserver;
+    private Observer<T> mObserver;
 
-    public void setObserver(Observer observer) {
+    public void setObserver(Observer<T> observer) {
         mObserver = observer;
     }
 
@@ -35,14 +33,6 @@ public abstract class CommonTask<A, B> {
         new Task().execute();
     }
 
-    /**
-     * 启动异步参数
-     *
-     * @param a 异步任务传入参数，泛型，在新建子类时声明类型
-     */
-    public void startTask(A a) {
-        new Task().execute(a);
-    }
 
     /**
      * CommonTask.java
@@ -51,31 +41,29 @@ public abstract class CommonTask<A, B> {
      * @DESC: 类中的异步任务
      * @DATE: 2015年9月11日 上午8:59:56
      */
-    private class Task extends AsyncTask<A, Void, B> {
-        @SafeVarargs
+    private class Task extends AsyncTask<Void, Void, Boolean> {
         @Override
-        protected final B doInBackground(A... params) {
-            Log.e("doInBackground", "params>>>" + params + ">>length >>" + params.length);
-            if (0 == params.length) {
-                // 无参数
-                return CommonTask.this.doInBackground();
-            } else {
-                // 有参数
-                return CommonTask.this.doInBackground(params[0]);
-            }
+        protected Boolean doInBackground(Void... params) {
+            CommonTask.this.doInBackground();
+            return true;
         }
 
         @Override
-        protected void onPostExecute(B b) {
+        protected void onPostExecute(Boolean b) {
             super.onPostExecute(b);
-            //主线程返回内容
-            notifyObservers(b);
+            if (null != mObserver) {
+                if (b) {
+                    mObserver.onCompleted();
+                } else {
+                    mObserver.onError(new Exception("出错拉!!!"));
+                }
+            }
         }
     }
 
-    public void notifyObservers(B b) {
+    public void notifyObservers(T t) {
         if (null != mObserver) {
-            mObserver.update(b);
+            mObserver.onNext(t);
         }
     }
 
@@ -84,18 +72,8 @@ public abstract class CommonTask<A, B> {
      *
      * @return
      */
-    public B doInBackground() {
+    public Boolean doInBackground() {
         return null;
     }
 
-    /**
-     * 异步任务执行方法，带参数，为子线程操作
-     *
-     * @param a
-     *
-     * @return
-     */
-    public B doInBackground(A a) {
-        return null;
-    }
 }
